@@ -1,0 +1,46 @@
+#!/bin/bash
+display_current_date_time() {
+    echo "$(date)"
+}
+openrcfile=$1
+tag=$2
+ssh_key=$3
+no_of_serv=3   
+
+display_current_date_time
+echo "Starting deployment of $tag using $openrcfile for credentials." 
+source $openrcfile  
+
+def_network="$2_network"
+def_subnet="$2_subnet"
+def_keypair="$2_key"
+def_router="$2_router"
+def_security_grp="$2_security_group"
+haproxyserv="$2_HAproxy"
+haproxyserv2="$2_HAproxy2"
+bastionserv="$2_bastion"
+devlop_serv="$2_dev"
+virtualip="$2_vip" 
+sshconf_file="config"
+knownhosts="known_hosts"
+hostsfile="hosts"
+
+if test -f "$sshconf_file"; then
+    rm "$sshconf_file"
+fi
+
+if test -f "$knownhosts"; then
+    rm "$knownhosts"
+fi
+
+if test -f "$hostsfile"; then
+    rm "$hostsfile"
+fi  
+
+checking_keypair=$(openstack keypair list -f value --column Name)
+if ! grep -qFx "$def_keypair" <<< "$checking_keypair"; then
+    keypair_create=$(openstack keypair create --public-key "$ssh_key" "$def_keypair")
+    echo "$(date) keypair created $def_keypair"
+else
+    echo "$(date) $def_keypair already exists"
+fi
