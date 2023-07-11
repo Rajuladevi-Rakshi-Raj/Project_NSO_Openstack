@@ -44,3 +44,55 @@ if ! grep -qFx "$def_keypair" <<< "$checking_keypair"; then
 else
     echo "$(date) $def_keypair already exists"
 fi
+checking_networks=$(openstack network list -f value --column Name)
+if ! grep -qFx "$def_network" <<< "$checking_networks"; then
+    network_create=$(openstack network create --tag "$tag" "$def_network" -f json)
+    echo "$(date) network created $def_network"
+else
+    echo "$(date) $def_network already exists"
+fi
+
+checking_subnets=$(openstack subnet list -f value --coulmn Name)
+if ! grep -qFx "$def_subnet" <<< "$checking_subnets"; then
+    subnet_create=$(openstack subnet create --tag "$tag" --network def_network --subnet-range 10.50.0.0/24 --gateway 10.50.0.1 --allocation-pool start=10.50.0.2,end=10.50.0.100 "$def_subnet" -f json)
+    echo "$(date) subnet created $def_subnet"
+else
+    echo "$(date) $def_subnet already exists"
+fi
+
+checking_routers=$(openstack router list -f value --column Name)
+if ! grep -qFx "$def_router" <<< "$checking_routers"; then
+    router_create=$(openstack router create --tag $tag $def_router)
+    echo "$(date) router created $def_router"
+    #adding subnet and externel gateway to the router
+    gatewaysetting=$(openstack router set --external-gateway ext-net $def_router)
+    subnetadding=$(openstack router add subnet $def_router $def_subnet)
+else
+    echo "$(date) $def_router already exists
+fi
+
+checking_secgrps=$(openstack security group list -f value --column Name)
+
+if echo "$checking_secgrps" | grep -qFx $def_security_grp; then
+    echo "$(date) $def_security_grp already exists"
+else
+    secgrp_create=$(openstack security group create --tag $tag $def_security_grp -f json)
+    sec_rule1=$(openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 22 --protocol tcp --ingress $def_security_grp)
+    sec_rule2=$(openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 80 --protocol icmp --ingress $def_security_grp)
+    sec_rule3=$(openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 5000 --protocol tcp --ingress $def_security_grp)
+    sec_rule4=$(openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 8080 --protocol tcp --ingress $def_security_grp)
+    sec_rule5=$(openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 6000 --protocol udp --ingress $def_security_grp)
+    sec_rule6=$(openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 9090 --protocol tcp --ingress $def_security_grp)
+    sec_rule7=$(openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 9100 --protocol tcp --ingress $def_security_grp)
+    sec_rule8=$(openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 3000 --protocol tcp --ingress $def_security_grp)
+    sec_rule9=$(openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 161 --protocol udp --ingress $def_security_grp)
+    sec_rule10=$(openstack security group rule create --protocol 112 $def_security_grp) 
+
+    echo "$(date) security group created $def_security_grp"
+fi 
+
+echo "$(date)creating virtual port"
+viripprt=$(openstack port create --network "$def_network" --fixed-ip subnet="$def_subnet" --no-security-group "$virtualip" )
+
+ipadd_notassign=$(openstack floating ip list --status DOWN -f value -c "Floating IP Address")
+
