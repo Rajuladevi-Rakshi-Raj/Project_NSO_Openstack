@@ -232,3 +232,38 @@ echo "[webservers]" >>"$hostsfile"
 awakeserv=$(openstack server list --status ACTIVE -f value -c Name | grep -oP "${tag}_dev([1-9]+)")
 echo "$awakeserv"
 
+# servers looping
+echo "$awakeserv" | while IFS= read -r serv; do
+    ipadd=$(openstack server list --name "$serv" -c Networks -f value | grep -Po '\d+\.\d+\.\d+\.\d+')
+    echo " " >>"$sshconf_file"
+    echo "Host $serv" >>"$sshconf_file"
+    echo "   User ubuntu" >>"$sshconf_file"
+    echo "   HostName $ipadd" >>"$sshconf_file"
+    echo "   IdentityFile ~/.ssh/id_rsa" >>"$sshconf_file"
+    echo "   UserKnownHostsFile=/dev/null" >>"$sshconf_file"
+    echo "   StrictHostKeyChecking no" >>"$sshconf_file"
+    echo "   PasswordAuthentication no" >>"$sshconf_file"
+    echo "   ProxyJump $bastionserv" >>"$sshconf_file"
+
+    echo "$serv" >>"$hostsfile"
+done
+
+echo " " >>"$hostsfile"
+echo "[primary_proxy]" >>"$hostsfile"
+echo "$haproxyserv" >>"$hostsfile"
+echo " " >>"$hostsfile"
+echo "[backup_proxy]" >>"$hostsfile"
+echo "$haproxyserv2" >>"$hostsfile"
+
+echo " " >>"$hostsfile"
+echo "[all:vars]" >>"$hostsfile"
+echo "ansible_user=ubuntu" >>"$hostsfile"
+echo "ansible_ssh_private_key_file=~/.ssh/id_rsa" >>"$hostsfile"
+echo "ansible_ssh_common_args='-F $sshconf_file'" >>"$hostsfile"
+
+echo "$(date) Running ansible playbook"
+ansible-playbook -i "$hostsfile" site.yaml
+
+echo "Bastion IP address: "$floating_ip1""
+
+echo "HAproxy IP address: "$floating_ip2""
