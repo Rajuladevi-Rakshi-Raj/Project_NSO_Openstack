@@ -230,5 +230,5 @@ echo " " >>"$hostsfile"
 echo "[webservers]" >>"$hostsfile"
 
 awakeserv=$(openstack server list --status ACTIVE -f value -c Name | grep -oP "${tag}_dev([1-9]+)")
-echo "$awakeserv"s
+echo "$awakeserv"
 
