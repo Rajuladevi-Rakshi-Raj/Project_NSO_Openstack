@@ -106,37 +106,5 @@ if ! echo "$serv_contained" | grep -q "$bastionserv"; then
         else
             echo "$(date) Creating floating IP for bastion"
             floating_ip1create=$(openstack floating ip create ext-net -f json | jq -r '.floating_ip_address' > floatipadd1)
-            floating_ip1="$(cat floatipadd1)"
-        fi
-    else
-            echo "$(date) Creating floating IP for bastion"
-            floating_ip1create=$(openstack floating ip create ext-net -f json | jq -r '.floating_ip_address' > floatipadd1)
-            floating_ip1="$(cat floatipadd1)"
-    fi
-
-    create_bastion=$(openstack server create --image "Ubuntu 20.04 Focal Fossa x86_64" $bastionserv --key-name $def_keypair --flavor "1C-2GB-50GB" --network $def_network --security-group $def_security_grp)
-    fipadd_bastion=$(openstack server add floating ip $bastionserv $floating_ip1)
-    echo "$(date) Created $bastionserv server"
-else
-    echo "$(date) $bastionserv already exists"
-fi
-#servers deployment haproxies
-if ! echo "$serv_contained" | grep -q "$haproxyserv"; then
-    if [[ -n "$ipadd_notassign" ]]; then
-        floating_ip2=$(echo "$ipadd_notassign" | awk '{print $2}')
-        if [[ -n "$floating_ip2" ]]; then
-            echo "$(date) floating IP is given for Haproxy server"
-        else
-            echo "$(date) Creating floating IP for Haproxy"
-            floating_ip2create=$(openstack floating ip create ext-net -f json | jq -r '.floating_ip_address' > floatipadd2)
-            floating_ip2="$(cat floatipadd2)"
-        fi
-    else
-            echo "$(date) Creating floating IP for Haproxy"
-            floating_ip2create=$(openstack floating ip create ext-net -f json | jq -r '.floating_ip_address' > floatipadd2)
-            floating_ip2="$(cat floatipadd2)"
-    fi
-
-    create_haproxy=$(openstack server create --image "Ubuntu 20.04 Focal Fossa x86_64" $haproxyserv --key-name $def_keypair --flavor "1C-2GB-50GB" --network $def_network --security-group $def_security_grp)
-    create_haproxy2=$(openstack server create --image "Ubuntu 20.04 Focal Fossa x86_64" $haproxyserv2 --key-name $def_keypair --flavor "1C-2GB-50GB" --network $def_network --security-group $def_security_grp) 
-    echo "$(date) 
+        floating IP for Haproxy"
+             
