@@ -98,13 +98,4 @@ ipadd_notassign=$(openstack floating ip list --status DOWN -f value -c "Floating
 # servers deployment bastion
 serv_contained=$(openstack server list --status ACTIVE --column Name -f value)
 
-if ! echo "$serv_contained" | grep -q "$bastionserv"; then
-    if [[ -n "$ipadd_notassign" ]]; then
-        floating_ip1=$(echo "$ipadd_notassign" | awk '{print $1}')
-        if [[ -n "$floating_ip1" ]]; then
-            echo "$(date) floating IP is given for bastion server"
-        else
-            echo "$(date) Creating floating IP for bastion"
-            floating_ip1create=$(openstack floating ip create ext-net -f json | jq -r '.floating_ip_address' > floatipadd1)
-        floating IP for Haproxy"
              
