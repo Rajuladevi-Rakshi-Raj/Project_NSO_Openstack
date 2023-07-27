@@ -37,17 +37,4 @@ if test -f "$hostsfile"; then
     rm "$hostsfile"
 fi  
 
-checking_keypair=$(openstack keypair list -f value --column Name)
-if ! grep -qFx "$def_keypair" <<< "$checking_keypair"; then
-    keypair_create=$(openstack keypair create --public-key "$ssh_key" "$def_keypair")
-    echo "$(date) keypair created $def_keypair"
-else
-    echo "$(date) $def_keypair already exists"
-fi
-checking_networks=$(openstack network list -f value --column Name)
-if ! grep -qFx "$def_network" <<< "$checking_networks"; then
-    network_c
-if ! grep -qFx "$def_subnet" <<< "$checking_subnets"; then
-    
-
              
