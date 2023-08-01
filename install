@@ -28,13 +28,6 @@ hostsfile="hosts"
 if test -f "$sshconf_file"; then
     rm "$sshconf_file"
 fi
-
-if test -f "$knownhosts"; then
-    rm "$knownhosts"
-fi
-
-if test -f "$hostsfile"; then
-    rm "$hostsfile"
-fi  
+ 
 
              
