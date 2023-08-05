@@ -14,20 +14,7 @@ source $openrcfile
 def_network="$2_network"
 def_subnet="$2_subnet"
 def_keypair="$2_key"
-def_router="$2_router"
-def_security_grp="$2_security_group"
-haproxyserv="$2_HAproxy"
-haproxyserv2="$2_HAproxy2"
-bastionserv="$2_bastion"
-devlop_serv="$2_dev"
-virtualip="$2_vip" 
-sshconf_file="config"
-knownhosts="known_hosts"
-hostsfile="hosts"
 
-if test -f "$sshconf_file"; then
-    rm "$sshconf_file"
-fi
  
 
              
