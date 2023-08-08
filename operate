@@ -37,3 +37,32 @@ removeconf(){
    fi
 
 }
+createconf(){
+    floataddr_bastion=$(openstack server list --name "$bastionserv" -c Networks -f value | grep -Po '\d+\.\d+\.\d+\.\d+' | awk 'NR==2')
+    floataddr_proxy1=$(openstack server show "$haproxyserv" -c addresses | grep -Po '\d+\.\d+\.\d+\.\d+' | awk 'NR==1')
+    floataddr_proxy2=$(openstack server list --name "$haproxyserv2" -c Networks -f value | grep -Po '\d+\.\d+\.\d+\.\d+' | awk 'NR==1')
+    echo "$(date) Generating config file"
+    echo "Host $bastionserv" >>"$sshconf_file"
+    echo "   User ubuntu" >>"$sshconf_file"
+    echo "   HostName $floataddr_bastion" >>"$sshconf_file"
+    echo "   IdentityFile ~/.ssh/id_rsa" >>"$sshconf_file"
+    echo "   StrictHostKeyChecking no" >>"$sshconf_file"
+    echo "   PasswordAuthentication no" >>"$sshconf_file"
+
+    echo " " >>"$sshconf_file"
+    echo "Host $haproxyserv" >>"$sshconf_file"
+    echo "   User ubuntu" >>"$sshconf_file"
+    echo "   HostName $floataddr_proxy1" >>"$sshconf_file"
+    echo "   IdentityFile ~/.ssh/id_rsa" >>"$sshconf_file"
+    echo "   StrictHostKeyChecking no" >>"$sshconf_file"
+    echo "   PasswordAuthentication no" >>"$sshconf_file"
+    echo "   ProxyJump $bastionserv" >>"$sshconf_file"
+
+    echo " " >>"$sshconf_file"
+    echo "Host $haproxyserv2" >>"$sshconf_file"
+    echo "   User ubuntu" >>"$sshconf_file"
+    echo "   HostName $floataddr_proxy2" >>"$sshconf_file"
+    echo "   IdentityFile ~/.ssh/id_rsa" >>"$sshconf_file"
+    echo "   StrictHostKeyChecking no" >>"$sshconf_file"
+    echo "   PasswordAuthentication no" >>"$sshconf_file"
+    echo "   ProxyJump $bastionserv" >>"$sshconf_file"
