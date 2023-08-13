@@ -12,5 +12,5 @@ To run the code we use the fllowing commands
 2)./operate openrc tag ssh_Key                    
 3)./cleanup openrc tag ssh_Key
 
-openrc refers to a file containing your rc file
+openrc refers to a file containing your own rc file with reqired credentials.
 The parameter ssh_key refers to a file containing a public key. This key file is used for secure authentication and communication with remote systems. Ensure that the specified ssh_key file contains the public key of your local computer (Ubuntu).
