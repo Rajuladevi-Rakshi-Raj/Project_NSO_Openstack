@@ -42,3 +42,57 @@ clean_up_servers() {
       openstack server delete "$no_serv"
       ((i++))
     done
+
+echo "$(date) servers deleted"
+  else
+    echo "$(date) there are no servers available to delete"
+  fi
+}
+
+# Function to delete keypairs
+clean_up_keypairs() {
+  key=($(openstack keypair list -f value -c Name | grep "$tag.*"))
+
+  if [[ -n "$key" ]]; then
+    i=0
+
+    # Loop through each keypair and delete it
+    while [ $i -lt ${#key[@]} ]; do
+      pair="${key[$i]}"
+      openstack keypair delete "$pair"
+      ((i++))
+    done
+
+    echo "$(date) keypair deleted $def_keypair"
+  else
+    echo "$(date) there are no $def_keypair available to delete"
+  fi
+}
+
+# Function to delete floating IPs
+clean_up_floatips() {
+  floatadd=($(openstack floating ip list --status DOWN -f value -c "Floating IP Address"))
+
+  if [[ -n "$floatadd" ]]; then
+    i=0
+
+    # Loop through each floating IP and delete it
+    while [ $i -lt ${#floatadd[@]} ]; do
+      add_float="${floatadd[$i]}"
+      openstack floating ip delete "$add_float"
+      ((i++))
+    done
+
+    echo "$(date) floating IPs deleted"
+  else
+    echo "$(date) there are no floating IPs available to delete"
+  fi
+}
+
+# Function to delete virtual port
+clean_up_viprt() {
+  vip=$(openstack floating ip unset --port "$floating_ip2")
+  echo "$(date) disconnecting floating ip from virtual port"
+
+  vfip=$(openstack port show "$virtualip" -f value -c fixed_ips | grep -Po '\d+\.\d+\.\d+\.\d+')
+  echo "$vfip" >> vadd
