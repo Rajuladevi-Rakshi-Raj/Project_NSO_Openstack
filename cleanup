@@ -96,3 +96,37 @@ clean_up_viprt() {
 
   vfip=$(openstack port show "$virtualip" -f value -c fixed_ips | grep -Po '\d+\.\d+\.\d+\.\d+')
   echo "$vfip" >> vadd
+
+ # Unassign floating IPs
+  floatips_notassign=($(openstack floating ip list --port "$virtualip" --status ACTIVE -f value -c "Floating IP Address"))
+
+  for ipadd in "${floatips_notassign[@]}"; do
+    openstack floating ip unset --port "$ipadd"
+    echo "$(date) floating IP unset $ipadd from port"
+  done
+
+  # Delete virtual port
+  openstack port delete "$virtualip"
+  echo "$(date) virtual port deleted"
+}
+
+# Function to delete subnets
+clean_up_subnets() {
+  snets=($(openstack subnet list --tag "$tag" -c ID -f value))
+
+  if [[ -n "$snets" ]]; then
+    i=0
+
+    # Loop through each subnet and remove it
+    while [ $i -lt ${#snets[@]} ]; do
+      subnet="${snets[$i]}"
+      openstack router remove subnet "$def_router" "$subnet"
+      openstack subnet delete "$subnet"
+      ((i++))
+    done
+
+    echo "$(date) subnet deleted $def_subnet"
+  else
+    echo "$(date) there is no subnets available $def_subnet to delete"
+  fi
+}
