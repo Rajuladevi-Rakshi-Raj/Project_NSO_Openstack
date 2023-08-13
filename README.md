@@ -5,7 +5,7 @@
 -openstack 5.2.0 
 -jq-1.6
 
-The project solution consists of three operating modes; deployment, operations, and cleanup.  Access to the cloud is via an openrc file with the required credentials to access a specific cloud. At the time of deployment, the solution should use a TAG to attach to all items it creates within the OpenStack Cloud, as to enable easy identification of things 
+The project solution consists of three operating modes; deployment, operations, and cleanup.  Access to the cloud is via an openrc file with the required credentials to access a specific cloud. At the time of deployment, the solution should use a TAG to attach to all items it creates within the OpenStack Cloud, as to enable easy identification of things. 
 To run the code we use the fllowing commands 
 
 1)./install openrc tag ssh_key    
